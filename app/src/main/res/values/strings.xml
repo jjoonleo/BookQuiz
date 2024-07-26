@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">BookQuiz</string>
+
+    <string name="lower_grade_elementary_school" translation_description="Title for the tab navigation bar in home screen where users can see recommended books for lower grades of elementary school students">초등저</string>
+    <string name="higher_grade_elementary_school" translation_description="Title for the tab navigation bar in home screen where users can see recommended books for higher grades of elementary school students">초등고</string>
+    <string name="middle_school" translation_description="Title for the tab navigation bar in home screen where users can see recommended books for middle school students">중등</string>
+    <string name="high_school" translation_description="Title for the tab navigation bar in home screen where users can see recommended books for high school students">고등</string>
+</resources>
