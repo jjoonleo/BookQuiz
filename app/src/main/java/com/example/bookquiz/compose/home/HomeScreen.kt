@@ -7,8 +7,14 @@ import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.Orientation
+import androidx.compose.foundation.gestures.ScrollableState
+import androidx.compose.foundation.gestures.scrollable
+import androidx.compose.foundation.horizontalScroll
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
@@ -20,8 +26,12 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.PagerState
+import androidx.compose.foundation.pager.VerticalPager
 import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.icons.Icons
@@ -41,6 +51,7 @@ import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -51,6 +62,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.Placeholder
@@ -65,6 +77,7 @@ import com.example.bookquiz.R
 import com.example.bookquiz.ui.theme.BookQuizTheme
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
+import org.intellij.lang.annotations.JdkConstants.HorizontalAlignment
 import kotlin.enums.EnumEntries
 
 val notoSansKRFamily = FontFamily(
@@ -128,76 +141,81 @@ fun HomeScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(contentPadding)
-                .padding(horizontal = 30.dp)
         ) {
-            Spacer(modifier = Modifier.size(height = 24.dp, width = 0.dp))
-            Column(modifier = modifier.padding(end = 48.dp)) {
-                Text(
-                    "독서는 창조적 놀이다",
-                    fontFamily = notoSansKRFamily,
-                    fontWeight = FontWeight.Normal,
-                    fontSize = 26.sp
-                )
-                Spacer(modifier = Modifier.size(height = 0.dp, width = 0.dp))
-                Text(
-                    "책과 친해지는, 책읽기가 재미있는, 퀴즈로 즐기는 독서교육 프로그램",
-                    fontFamily = notoSansKRFamily,
-                    fontWeight = FontWeight.Normal,
-                    fontSize = 16.sp,
-                    color = Color.hsl(hue = 0.0f, saturation = 0.0f, lightness = 0.62f)
-                )
-            }
-            Box(modifier = Modifier.size(height = 38.dp, width = 0.dp))
-
-            BasicTextField(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(48.dp)
-                    .clip(shape = RoundedCornerShape(size = 10.dp))
-                    .background(
-                        color = Color.hsl(
-                            hue = 0.0f,
-                            saturation = 0.0f,
-                            lightness = 0.77f,
-                            alpha = 0.15f,
-                        )
+            Spacer(modifier = modifier.size(height = 24.dp, width = 0.dp))
+            Column(modifier = Modifier.padding(horizontal = dimensionResource(id = R.dimen.grid_horizontal_margin))) {
+                Column(modifier = modifier.padding(end = 48.dp)) {
+                    Text(
+                        "독서는 창조적 놀이다",
+                        fontFamily = notoSansKRFamily,
+                        fontWeight = FontWeight.Normal,
+                        fontSize = 26.sp
                     )
-                    .onFocusChanged {
-                        searchText = if (it.isFocused) {
-                            ""
-                        } else {
-                            "Search"
+                    Spacer(modifier = Modifier.size(height = 0.dp, width = 0.dp))
+                    Text(
+                        "책과 친해지는, 책읽기가 재미있는, 퀴즈로 즐기는 독서교육 프로그램",
+                        fontFamily = notoSansKRFamily,
+                        fontWeight = FontWeight.Normal,
+                        fontSize = 16.sp,
+                        color = Color.hsl(hue = 0.0f, saturation = 0.0f, lightness = 0.62f)
+                    )
+                }
+
+                Box(modifier = Modifier.size(height = 38.dp, width = 0.dp))
+
+                BasicTextField(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(48.dp)
+                        .clip(shape = RoundedCornerShape(size = 10.dp))
+                        .background(
+                            color = Color.hsl(
+                                hue = 0.0f,
+                                saturation = 0.0f,
+                                lightness = 0.77f,
+                                alpha = 0.15f,
+                            )
+                        )
+                        .onFocusChanged {
+                            searchText = if (it.isFocused) {
+                                ""
+                            } else {
+                                "Search"
+                            }
+                        },
+                    value = searchText,
+                    onValueChange = { searchText = it },
+                    textStyle = LocalTextStyle.current.copy(
+                        textAlign = TextAlign.Start,
+                        color = Color.hsl(hue = 0.0f, saturation = 0.0f, lightness = 0.77f)
+                    ),
+                    singleLine = true,
+                    decorationBox = { innerTextField ->
+                        Row(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .padding(horizontal = 24.dp, vertical = 12.dp),
+                            verticalAlignment = Alignment.CenterVertically,
+                        ) {
+                            Icon(
+                                painter = painterResource(id = R.drawable.magnifyingglass),
+                                contentDescription = "",
+                                tint = Color.hsl(hue = 0.0f, saturation = 0.0f, lightness = 0.77f),
+                            )
+                            Spacer(modifier = Modifier.width(width = 8.dp))
+                            innerTextField()
                         }
                     },
-                value = searchText,
-                onValueChange = { searchText = it },
-                textStyle = LocalTextStyle.current.copy(
-                    textAlign = TextAlign.Start,
-                    color = Color.hsl(hue = 0.0f, saturation = 0.0f, lightness = 0.77f)
-                ),
-                singleLine = true,
-                decorationBox = { innerTextField ->
-                    Row(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .padding(horizontal = 24.dp, vertical = 12.dp),
-                        verticalAlignment = Alignment.CenterVertically,
-                    ) {
-                        Icon(
-                            painter = painterResource(id = R.drawable.magnifyingglass),
-                            contentDescription = "",
-                            tint = Color.hsl(hue = 0.0f, saturation = 0.0f, lightness = 0.77f),
-                        )
-                        Spacer(modifier = Modifier.width(width = 8.dp))
-                        innerTextField()
-                    }
-                },
-            )
+                )
+            }
+
+            Spacer(modifier = Modifier.height(24.dp))
 
             RecommendedBooksPagerScreen(
-                pagerState = pagerState,
                 pages = pages,
+                paddingValues = PaddingValues(horizontal = dimensionResource(id = R.dimen.grid_horizontal_margin))
             )
+
         }
 
     }
@@ -206,25 +224,38 @@ fun HomeScreen(
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun RecommendedBooksPagerScreen(
-    pagerState: PagerState,
     pages: EnumEntries<RecommendedBookListPage>,
-    modifier: Modifier = Modifier
+    paddingValues: PaddingValues
 ) {
+
+    var selectedTabIndex by remember { mutableIntStateOf(1) }
     TabRow(
-        modifier = modifier,
-        selectedTabIndex = pagerState.currentPage
+        modifier = Modifier.padding(paddingValues),
+        selectedTabIndex = selectedTabIndex,
     ) {
         val coroutineScope = rememberCoroutineScope()
         pages.forEachIndexed { index, page ->
             val title = stringResource(id = page.titleResId)
             Tab(
-                selected = pagerState.currentPage == index,
-                onClick = { coroutineScope.launch{ pagerState.animateScrollToPage(index) } },
+                selected = selectedTabIndex == index,
+                onClick = { selectedTabIndex = index },
                 text = { Text(text = title) },
                 unselectedContentColor = MaterialTheme.colorScheme.secondary
             )
         }
     }
+
+    Spacer(modifier = Modifier.heightIn(32.dp))
+
+    LazyRow(
+        horizontalArrangement = Arrangement.spacedBy(34.dp),
+        contentPadding = paddingValues
+    ) {
+        items(5) { index ->
+            ImageListItem(name = "Book$index", imageUrl = "https://bookquiz.co.kr/quizbank/bookimg/%EC%98%A4%EB%8A%98%EB%B6%80%ED%84%B0%EB%B2%A0%ED%94%84%EB%B2%A0%ED%94%84.jpg", onClick = {})
+        }
+    }
+
 }
 
 @Preview
