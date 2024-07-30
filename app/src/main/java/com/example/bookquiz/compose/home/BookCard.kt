@@ -23,13 +23,20 @@ import androidx.compose.ui.unit.dp
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
 import com.example.bookquiz.R
+import com.example.bookquiz.compose.data.Book
 
 @Composable
-fun BookListItem()
+fun BookListItem(book: Book) {
+    ImageListItem(
+        title = book.title,
+        imageUrl = book.imageUrl,
+        onClick = { /*TODO*/ }
+    )
+}
 
 @OptIn(ExperimentalGlideComposeApi::class)
 @Composable
-fun ImageListItem(name: String, imageUrl: String, onClick: () -> Unit) {
+fun ImageListItem(title: String, imageUrl: String, onClick: () -> Unit) {
     Card(
         onClick = onClick,
         colors = CardDefaults.cardColors(containerColor = Color.Transparent),
@@ -54,7 +61,7 @@ fun ImageListItem(name: String, imageUrl: String, onClick: () -> Unit) {
 
             Spacer(modifier = Modifier.height(16.dp))
             Text(
-                text = name,
+                text = title,
                 textAlign = TextAlign.Start,
                 maxLines = 1,
                 style = MaterialTheme.typography.titleMedium,
@@ -70,7 +77,7 @@ fun ImageListItem(name: String, imageUrl: String, onClick: () -> Unit) {
 @Composable
 fun ImageListItemPreview() {
     ImageListItem(
-        name = "test",
+        title = "test",
         imageUrl = "https://bookquiz.co.kr/quizbank/bookimg/%EC%98%A4%EB%8A%98%EB%B6%80%ED%84%B0%EB%B2%A0%ED%94%84%EB%B2%A0%ED%94%84.jpg",
         onClick = {}
     )

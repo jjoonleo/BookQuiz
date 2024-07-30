@@ -74,6 +74,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.bookquiz.R
+import com.example.bookquiz.compose.data.Book
 import com.example.bookquiz.ui.theme.BookQuizTheme
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
@@ -96,6 +97,35 @@ enum class RecommendedBookListPage(
     HigherGradeElementarySchool(R.string.higher_grade_elementary_school),
     MiddleSchool(R.string.middle_school),
     HighSchool(R.string.high_school)
+}
+
+object TempRecommendedBooks {
+    private val books = mutableMapOf<RecommendedBookListPage, List<Book>>(
+        RecommendedBookListPage.LowerGradeElementarySchool to listOf(
+            Book(
+                title = "오늘 부터 베프 베프",
+                author = "지안",
+                imageUrl = "https://bookquiz.co.kr/quizbank/bookimg/%EC%98%A4%EB%8A%98%EB%B6%80%ED%84%B0%EB%B2%A0%ED%94%84%EB%B2%A0%ED%94%84.jpg",
+                publisher = "문학동네"
+            ),
+            Book(
+                title = "마법 식탁",
+                author = "최도은",
+                imageUrl = "https://bookquiz.co.kr/quizbank/bookimg/%EB%A7%88%EB%B2%95%20%EC%8B%9D%EC%B9%98.jpg",
+                publisher = "뜨인돌어린이"
+
+            )
+        ),
+        RecommendedBookListPage.HigherGradeElementarySchool to listOf(),
+        RecommendedBookListPage.MiddleSchool to listOf(),
+        RecommendedBookListPage.HighSchool to listOf()
+    )
+
+    fun getBooks(page: RecommendedBookListPage): List<Book> {
+        return books[page] ?: emptyList()
+    }
+
+
 }
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
@@ -251,8 +281,8 @@ fun RecommendedBooksPagerScreen(
         horizontalArrangement = Arrangement.spacedBy(34.dp),
         contentPadding = paddingValues
     ) {
-        items(5) { index ->
-            ImageListItem(name = "Book$index", imageUrl = "https://bookquiz.co.kr/quizbank/bookimg/%EC%98%A4%EB%8A%98%EB%B6%80%ED%84%B0%EB%B2%A0%ED%94%84%EB%B2%A0%ED%94%84.jpg", onClick = {})
+        items(TempRecommendedBooks.getBooks(pages[selectedTabIndex]).size) { index ->
+            BookListItem(book = TempRecommendedBooks.getBooks(pages[selectedTabIndex])[index])
         }
     }
 
